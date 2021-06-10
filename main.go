@@ -1,59 +1,61 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	BIAS = 132
 	CLIP = 32635
 )
 
-func disp_c(value int){
-	fmt.Printf("\t")
-	for i:=0x80; i>0; i >>=1{
-		if value & i != 0{}
-	}
+
+
+
+func dispC(value int){
+
+	fmt.Printf("%b", value)
 }
 
-func g711encode(audio_sample int) int{
+func g711encode(audioSample int) int{
 	var mask int
 
-	if audio_sample > 0 && audio_sample > CLIP {audio_sample = CLIP}
-	if audio_sample < 0 && audio_sample < -CLIP{audio_sample = -CLIP}
-	if audio_sample < 0{
+	if audioSample > 0 && audioSample > CLIP {
+		audioSample = CLIP
+	}else if audioSample < 0 && audioSample < -CLIP{
+		audioSample = -CLIP
+	}
+
+	if audioSample < 0{
 		mask = 0xff
-		audio_sample = -audio_sample
+		audioSample = -audioSample
 	}else{
 		mask = 0xff
 	}
-	audio_sample += BIAS
+	audioSample += BIAS
 	i := 7
 	for r:=0x4000; r>=0x80; r>>=1{
-		b := r & audio_sample
-		fmt.Println(b)
+		b := r & audioSample
 		if b != 0 {break}
 		i--
 	}
-	mulaw_val := (i << 4) + ((audio_sample >> (i + 3)) & 0x0f)
-	disp_c(mulaw_val)
-	fmt.Println(mask)
 
-	return mulaw_val
+	mulawVal := (i << 4) + ((audioSample >> (i + 3)) & 0x0f)
+	dispC(mulawVal)
+	return mulawVal ^ mask
 }
 
 
-
 func main(){
-	a_smp := []int{
+	aSmp := []int{
 		0, 140, 444, 1084, -2460, -5372, -11420, -24060,
 	}
-	fmt.Println(a_smp)
 
-	t := 01
+	for a := range aSmp{
+		muVal := g711encode(aSmp[a])
+		fmt.Printf("\t%b", muVal)
+		fmt.Printf("\n")
+	}
 
-	fmt.Println(t)
-	t <<= 2
-	fmt.Println(t)
 
-
-	g711encode(12)
 }
